@@ -13,7 +13,7 @@ public class Main
         {
             converter.convert("jdbc:postgresql://localhost:5432/job_postings","postgres","password","C:\\Users\\User\\Documents\\e");
         }
-        catch(SQLException e)
+        catch(Exception e)
         {
             e.printStackTrace();
         }

@@ -5,17 +5,30 @@ import app.dto.EntityFieldDTO;
 import app.util.DataTypeUtil;
 import app.util.NameUtil;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
 public class PostgresDBUtil
 {
-    public static List<EntityDTO> getEntities(Connection connection,List<String> tableNames) throws SQLException
+    private static Connection getConnection(String connectionString,String user,String password) throws SQLException
     {
+        return DriverManager.getConnection(connectionString, user, password);
+    }
+    public static List<String> getTableNames(String connectionString,String user,String password) throws SQLException
+    {
+        Connection connection=getConnection(connectionString, user, password);
+        PreparedStatement preparedStatement=connection.prepareStatement(
+                "SELECT table_name FROM information_schema.tables WHERE table_type='BASE TABLE' and table_schema='public'");
+        ResultSet resultSet=preparedStatement.executeQuery();
+        List<String> tableNames=new LinkedList<>();
+        while(resultSet.next())
+            tableNames.add(resultSet.getString(1));
+        return tableNames;
+    }
+    public static List<EntityDTO> getEntities(String connectionString,String user,String password,List<String> tableNames) throws SQLException
+    {
+        Connection connection=getConnection(connectionString, user, password);
         List<EntityDTO> entities=new LinkedList<>();
         for(String tableName: tableNames)
         {
@@ -48,15 +61,5 @@ public class PostgresDBUtil
             entities.add(entityDTO);
         }
         return entities;
-    }
-    public static List<String> getTableNames(Connection connection) throws SQLException
-    {
-        PreparedStatement preparedStatement=connection.prepareStatement(
-                "SELECT table_name FROM information_schema.tables WHERE table_type='BASE TABLE' and table_schema='public'");
-        ResultSet resultSet=preparedStatement.executeQuery();
-        List<String> tableNames=new LinkedList<>();
-        while(resultSet.next())
-            tableNames.add(resultSet.getString(1));
-        return tableNames;
     }
 }

@@ -13,9 +13,8 @@ public class PostgresConverter
 {
     public void convert(String connectionString,String user,String password,String path) throws SQLException, IOException
     {
-        Connection connection=DriverManager.getConnection(connectionString, user, password);
-        List<String> tableNames=PostgresDBUtil.getTableNames(connection);
-        List<EntityDTO> entities=PostgresDBUtil.getEntities(connection,tableNames);
+        List<String> tableNames=PostgresDBUtil.getTableNames(connectionString,user,password);
+        List<EntityDTO> entities=PostgresDBUtil.getEntities(connectionString,user,password,tableNames);
         for(EntityDTO entity: entities)
         {
             String content=EntityUtil.generateContent(entity);

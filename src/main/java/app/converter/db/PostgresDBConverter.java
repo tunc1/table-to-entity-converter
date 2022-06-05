@@ -1,4 +1,4 @@
-package app.util.db;
+package app.converter.db;
 
 import app.dto.EntityDTO;
 import app.dto.EntityFieldDTO;
@@ -9,13 +9,13 @@ import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PostgresDBUtil
+public class PostgresDBConverter extends DBConverter
 {
-    private static Connection getConnection(String connectionString,String user,String password) throws SQLException
+    private Connection getConnection(String connectionString,String user,String password) throws SQLException
     {
         return DriverManager.getConnection(connectionString, user, password);
     }
-    public static List<String> getTableNames(String connectionString,String user,String password) throws SQLException
+    public List<String> getTableNames(String connectionString,String user,String password) throws SQLException
     {
         Connection connection=getConnection(connectionString, user, password);
         PreparedStatement preparedStatement=connection.prepareStatement(
@@ -24,9 +24,10 @@ public class PostgresDBUtil
         List<String> tableNames=new LinkedList<>();
         while(resultSet.next())
             tableNames.add(resultSet.getString(1));
+        connection.close();
         return tableNames;
     }
-    public static List<EntityDTO> getEntities(String connectionString,String user,String password,List<String> tableNames) throws SQLException
+    public List<EntityDTO> getEntities(String connectionString,String user,String password,List<String> tableNames) throws SQLException
     {
         Connection connection=getConnection(connectionString, user, password);
         List<EntityDTO> entities=new LinkedList<>();
@@ -60,6 +61,7 @@ public class PostgresDBUtil
             }
             entities.add(entityDTO);
         }
+        connection.close();
         return entities;
     }
 }
